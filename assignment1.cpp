@@ -13,17 +13,35 @@ class SimpleList {
 		struct Node{
 			T data;
 			Node *next;
-			Node (const T d, Node *n = nullptr) : data{d}, next{n} {}
+			Node (const T d , Node *n = nullptr) : data{d}, next{n} {}
+			Node (Node *n = nullptr) : next{n} {}
 		};
 		Node *head;
 		Node *tail;
 	protected:
-		void insertFront();
-		void insertEnd();
+		void insertFront(T data);
+		void insertEnd(T data);
 		void removeFront();
 	public:
+		SimpleList (string n){
+			name = n;
+			size = 0;
+			tail = new Node();
+			head = new Node(tail);
+		}
+		void getName();
+		void getSize();
+		virtual void push(T data) = 0;
+		virtual void pop() = 0;
 				
 };
+
+void SimpleList::insertFront(T data){
+	
+}
+
+
+
 
 void getInOutFile(string &inFile, string &outFile){
 	cout << "Please type the name of the commands textfile:" << endl;
