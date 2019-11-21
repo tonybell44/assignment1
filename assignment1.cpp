@@ -16,18 +16,23 @@ class SimpleList {
 			Node (const T d , Node *n = nullptr) : data{d}, next{n} {}
 			Node (Node *n = nullptr) : next{n} {}
 		};
-		Node *head;
+		struct HeadNode{				//just head node
+			Node *next;
+			Node *last;
+			HeadNode (Node *n) : next{n} {}
+		}
+		HeadNode *head;
 		Node *tail;
 	protected:
 		void insertFront(T data);
 		void insertEnd(T data);
 		void removeFront();
 	public:
-		SimpleList (string n){
+		SimpleList (string n){		//Maybe add outside of class :)
 			name = n;
 			size = 0;
 			tail = new Node();
-			head = new Node(tail);
+			head = new HeadNode(tail);
 		}
 		void getName();
 		void getSize();
@@ -36,8 +41,25 @@ class SimpleList {
 				
 };
 
-void SimpleList::insertFront(T data){
-	
+Template <typename T>
+void SimpleList::insertFront(T data){	//check syntax
+	Node *newNode = new Node(data, head.next);
+	head.next = newNode;
+	size++;
+}
+
+Template <typename T>
+void SimpleList::insertEnd(T data){
+	Node *newNode = new Node(data, tail);
+	if (size == 0){
+		head.next = newNode;
+		head.last = newNode;
+	}
+	else if (size > 0){
+		*(head.last).next = newNode;			//be careful
+		head.last = newNode;
+	}
+	size++;
 }
 
 
