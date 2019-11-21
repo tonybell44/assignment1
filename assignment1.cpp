@@ -19,7 +19,7 @@ class SimpleList {
 		struct HeadNode{				//just head node
 			Node *next;
 			Node *last;
-			HeadNode (Node *n) : next{n} {}
+			HeadNode (Node *n, Node *l = nullptr) : next{n}, last{l} {}
 		}
 		HeadNode *head;
 		Node *tail;
@@ -34,8 +34,8 @@ class SimpleList {
 			tail = new Node();
 			head = new HeadNode(tail);
 		}
-		void getName();
-		void getSize();
+		string getName();
+		int getSize();
 		virtual void push(T data) = 0;
 		virtual void pop() = 0;
 				
@@ -46,6 +46,7 @@ void SimpleList::insertFront(T data){	//check syntax
 	Node *newNode = new Node(data, head.next);
 	head.next = newNode;
 	size++;
+	return;
 }
 
 Template <typename T>
@@ -60,9 +61,26 @@ void SimpleList::insertEnd(T data){
 		head.last = newNode;
 	}
 	size++;
+	return;
 }
 
+Template <typename T>
+T SimpleList::removeFront(){			//make sure later code doesnt permit this if size == zero
+	T object = *(head.next).data;
+	Node *intermediateNode = *(head.next).next;
+	delete head.next;
+	head.next = intermediateNode;
+	size--;
+	return object;
+}
 
+string SimpleList::getName(){
+	return name;
+}
+
+int Simplelist::getSize(){
+	return size;
+}
 
 
 void getInOutFile(string &inFile, string &outFile){
