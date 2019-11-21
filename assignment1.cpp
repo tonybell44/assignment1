@@ -1,8 +1,29 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <list>
 
 using namespace std;
+
+template <typename T>
+class SimpleList {
+	private:
+		string name;
+		int size;
+		struct Node{
+			T data;
+			Node *next;
+			Node (const T d, Node *n = nullptr) : data{d}, next{n} {}
+		};
+		Node *head;
+		Node *tail;
+	protected:
+		void insertFront();
+		void insertEnd();
+		void removeFront();
+	public:
+				
+};
 
 void getInOutFile(string &inFile, string &outFile){
 	cout << "Please type the name of the commands textfile:" << endl;
@@ -20,8 +41,20 @@ bool checkCommand(const string cm1) {
 	else {return false;}
 }
 
-void runCommands (const string cm1, const string cm2, const string cm3 = "null"){
+void create(const string name, const string type){
 	
+}
+
+void runCommands (const string cm1, const string cm2, const string cm3 = "null"){
+	switch (cm1) {
+		case "create":
+			create(cm2, cm3);			//creates stack or queue based on name
+		case "push":
+			push(cm2, cm3);
+		case "pop":
+			pop(cm2);
+	}
+	return;
 }
 
 
