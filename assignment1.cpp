@@ -45,8 +45,8 @@ class SimpleList {
 
 template <typename T>
 void SimpleList<T>::insertFront(T data){	//check syntax
-	Node *newNode = new Node(data, head.next);
-	head.next = newNode;
+	Node *newNode = new Node(data, head->next);
+	head->next = newNode;
 	size++;
 	return;
 }
@@ -55,12 +55,12 @@ template <typename T>
 void SimpleList<T>::insertEnd(T data){
 	Node *newNode = new Node(data, tail);
 	if (size == 0){
-		head.next = newNode;
-		head.last = newNode;
+		head->next = newNode;
+		head->last = newNode;
 	}
 	else if (size > 0){
-		*(head.last).next = newNode;			//be careful
-		head.last = newNode;
+		*(head->last)->next = newNode;			//be careful
+		head->last = newNode;
 	}
 	size++;
 	return;
@@ -68,10 +68,10 @@ void SimpleList<T>::insertEnd(T data){
 
 template <typename T>
 T SimpleList<T>::removeFront(){			//make sure later code doesnt permit this if size == zero
-	T object = *(head.next).data;
-	Node *intermediateNode = *(head.next).next;
-	delete head.next;
-	head.next = intermediateNode;
+	T object = head->next->data;
+	Node *intermediateNode = head->next->next;
+	delete head->next;
+	head->next = intermediateNode;
 	size--;
 	return object;
 }
@@ -93,19 +93,18 @@ class Stack : public SimpleList<T>{
 	public:
 		void push(T data);
 		T pop();
-		T removeFront();		//try commenting this out: why doesn't it work then?
 		Stack(string n);
 };
 
 template <typename T>
 void Stack<T>::push(T data){
-	insertFront(data);
+	this->insertFront(data);
 	return;
 }
 
 template <typename T>
 T Stack<T>::pop(){
-	return removeFront();
+	return this->removeFront();
 }
 
 template <typename T>
@@ -117,19 +116,18 @@ class Queue : public SimpleList<T>{
 	public:
 		void push(T data);
 		T pop();
-		T removeFront();
 		Queue(string n);
 };
 
 template <typename T>
 void Queue<T>::push(T data){
-	insertEnd(data);
+	this->insertEnd(data);
 	return;
 }
 
 template <typename T>
 T Queue<T>::pop(){
-	return removeFront();
+	return this->removeFront();
 }
 
 template <typename T>
@@ -144,53 +142,93 @@ void getInOutFile(string &inFile, string &outFile){
 	return;
 }
 
-
-bool checkCommand(const string cm1) {
-	if ((cm1 == "create") || (cm1 == "push")){
-		return true;
+template <typename T>
+bool checkExistence(list<SimpleList<T> *> &SL, string name){			//true if name exists, false if name does not exist
+	typename list<SimpleList<T> *>::iterator it;
+	for (it = SL.begin(); it != SL.end(); it++){
+		if ((*it)->getName() == name){
+			return true;
+		}
 	}
-	else {return false;}
+	return false;
 }
 
-void create(const string name, const string type){
-	
+void create(const string name, const string type, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs){
+	if (*(name.begin()) == 'i'){
+		if (checkExistence(listSLi, name)){
+			SimpleList<int> *pSLi;
+			if (type == "stack"){
+				pSLi = new Stack<int>(name);
+				listSLi.push_front(pSLi);
+			}
+			else if (type == "queue"){
+				pSLi = new Queue<int>(name);
+				listSLi.push_front(pSLi);
+			}
+		}
+	}
+	else if (*(name.begin()) == 'd'){
+		if (checkExistence(listSLd, name)){
+			SimpleList<double> *pSLd;
+			if (type == "stack"){
+				pSLd = new Stack<double>(name);
+				listSLd.push_front(pSLd);
+			}
+			else if (type == "queue"){
+				pSLd = new Queue<double>(name);
+				listSLd.push_front(pSLd);
+			}
+		}
+	}
+	else if (*(name.begin()) == 's'){
+		if (checkExistence(listSLs, name)){
+			SimpleList<string> *pSLs;
+			if (type == "stack"){
+				pSLs = new Stack<string>(name);
+				listSLs.push_front(pSLs);
+			}
+			else if (type == "queue"){
+				pSLs = new Queue<string>(name);
+				listSLs.push_front(pSLs);
+			}
+		}
+	}
+	return;
 }
 
-void runCommands (const string cm1, const string cm2, const string cm3 = "null"){    //handles reading the names and calling appropriate commands
-	if (cm1 == "create"){
-		create (cm2, cm3);
+void runCommands (const string commandFileName, const string outputFileName){    //handles reading the names and calling appropriate commands
+	ifstream commands (commandFileName, ifstream::in);
+
+        list<SimpleList<int> *> listSLi;
+        list<SimpleList<double> *> listSLd;
+        list<SimpleList<string> *> listSLs;
+
+	string cm1, cm2, cm3;
+
+	while(commands >> cm1 >> cm2){
+		if (cm1 == "create"){
+			commands >> cm3;
+			create (cm2, cm3, listSLi, listSLd, listSLs);
+		}
+		else if (cm1 == "push"){
+			commands >> cm3;
+			push (cm2, cm3)
+		}
+		else if (cm1 == "pop"){
+			pop (cm2);
+		}
 	}
-	else if (cm1 == "push"){
-		push (cm2, cm3);
-	}
-	else if (cm1 == "pop"){
-		pop(cm2);
-	}
+	commands.close();
 	return;
 }
 
 
 int main() {
-	string cm1, cm2, cm3, commandFileName, outputFileName;
-
-	list<SimpleList<int> *> listSLi;
-	list<SimpleList<double> *> listSLd;
-	list<SimpleList<string> *> listSLs;
+	string commandFileName, outputFileName;
 
 	getInOutFile(commandFileName, outputFileName);			// Asks for names of input and output files
-	ifstream commands (commandFileName, ifstream::in);
 
+	runCommands(commandFileName, outputFileName);
 
-	while(commands >> cm1 >> cm2) {
-		if (checkCommand(cm1)){
-			commands >> cm3;
-			runCommands(cm1, cm2, cm3);
-		}
-		else {
-			runCommands(cm1, cm2);
-		}
-	}
-
-	commands.close();
 	return 0;
 }
