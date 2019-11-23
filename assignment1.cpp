@@ -143,17 +143,39 @@ void getInOutFile(string &inFile, string &outFile){
 }
 
 template <typename T>
-bool checkExistence(list<SimpleList<T> *> &SL, string name){			//true if name exists, false if name does not exist
+bool checkExistence(list<SimpleList<T> *> &SL, string name){			//return false if name exists, true if name does not exist
 	typename list<SimpleList<T> *>::iterator it;
 	for (it = SL.begin(); it != SL.end(); it++){
 		if ((*it)->getName() == name){
-			return true;
+			return false;
 		}
 	}
-	return false;
+	return true;
 }
 
-void create(const string name, const string type, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs){
+void commandMessage(int messageID, string cm1, string cm2, string cm3, ofstream &outFile){
+	if (messageID == 0){
+		outFile << "PROCESSING COMMAND: " << cm1 << " " << cm2 << " " << cm3 << "\n";
+	}
+	else if (messageID == 1){
+		outFile << "PROCESSING COMMAND: " << cm1 << " " << cm2 << " " << "\n";
+	}
+	return;
+}
+
+void errorMessage(int messageID, ofstream &outFile){
+	if (messageID == 0){
+		outFile << "ERROR: This name already exists!" << "\n";
+	}
+	else if (messageID == 1){
+		outFile << "ERROR: This name does not exist!" << "\n";
+	}
+	else if (messageID == 2){
+		outFile << "ERROR: This list is empty!" << "\n";
+	}
+}
+
+void create(const string name, const string type, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs, ofstream &outFile){
 	if (*(name.begin()) == 'i'){
 		if (checkExistence(listSLi, name)){
 			SimpleList<int> *pSLi;
@@ -165,6 +187,7 @@ void create(const string name, const string type, list<SimpleList<int> *> &listS
 				pSLi = new Queue<int>(name);
 				listSLi.push_front(pSLi);
 			}
+			return;
 		}
 	}
 	else if (*(name.begin()) == 'd'){
@@ -178,6 +201,7 @@ void create(const string name, const string type, list<SimpleList<int> *> &listS
 				pSLd = new Queue<double>(name);
 				listSLd.push_front(pSLd);
 			}
+			return;
 		}
 	}
 	else if (*(name.begin()) == 's'){
@@ -191,34 +215,49 @@ void create(const string name, const string type, list<SimpleList<int> *> &listS
 				pSLs = new Queue<string>(name);
 				listSLs.push_front(pSLs);
 			}
+			return;
 		}
 	}
+	errorMessage(0, outFile);
 	return;
+}
+
+template <typename T>
+void push(const string name, const T value, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs, ofstream &outFile){
+	if (*(name.begin()) == 'i'){
+		//HEEEEERRRREEEE
+	}	
 }
 
 void runCommands (const string commandFileName, const string outputFileName){    //handles reading the names and calling appropriate commands
 	ifstream commands (commandFileName, ifstream::in);
+	ofstream outFile;
+	outFile.open(outputFileName);
 
         list<SimpleList<int> *> listSLi;
         list<SimpleList<double> *> listSLd;
         list<SimpleList<string> *> listSLs;
 
-	string cm1, cm2, cm3;
+	string cm1, cm2, cm3 = "null";		//Important for case "pop"
 
 	while(commands >> cm1 >> cm2){
 		if (cm1 == "create"){
 			commands >> cm3;
-			create (cm2, cm3, listSLi, listSLd, listSLs);
+			commandMessage(0, cm1, cm2, cm3, outFile);
+			create (cm2, cm3, listSLi, listSLd, listSLs, outFile);
 		}
 		else if (cm1 == "push"){
 			commands >> cm3;
-			push (cm2, cm3)
+			commandMessage(0, cm1, cm2, cm3, outFile);
+			push (cm2, cm3, listSLi, listSLd, listSLs,outFile);
 		}
 		else if (cm1 == "pop"){
-			pop (cm2);
+			commandMessage(1, cm1, cm2, cm3, outFile);
+			pop (cm2, listSLi, listSLd, listSLs, outFile);
 		}
 	}
 	commands.close();
+	outFile.close();
 	return;
 }
 
