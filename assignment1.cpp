@@ -11,14 +11,14 @@ template <typename T>
 class SimpleList {
 	private:
 		string name;
-		int size;
+		int size;		//size exludes head and tail nodes when a SimpleList object is created
 		struct Node{
 			T data;
 			Node *next;
 			Node (const T d , Node *n = nullptr) : data{d}, next{n} {}
 			Node (Node *n = nullptr) : next{n} {}
 		};
-		struct HeadNode{				//just head node
+		struct HeadNode{	//Head node is a special type of node with an extra pointer and no data member
 			Node *next;
 			Node *last;
 			HeadNode (Node *n, Node *l = nullptr) : next{n}, last{l} {}
@@ -30,7 +30,7 @@ class SimpleList {
 		void insertEnd(T data);
 		T removeFront();
 	public:
-		SimpleList (string n){		//Maybe add outside of class :)
+		SimpleList (string n){
 			name = n;
 			size = 0;
 			tail = new Node();
@@ -44,7 +44,7 @@ class SimpleList {
 };
 
 template <typename T>
-void SimpleList<T>::insertFront(T data){	//check syntax
+void SimpleList<T>::insertFront(T data){
 	Node *newNode = new Node(data, head->next);
 	head->next = newNode;
 	size++;
@@ -59,7 +59,7 @@ void SimpleList<T>::insertEnd(T data){
 		head->last = newNode;
 	}
 	else if (size > 0){
-		(head->last)->next = newNode;			//be careful
+		(head->last)->next = newNode;
 		head->last = newNode;
 	}
 	size++;
@@ -67,7 +67,7 @@ void SimpleList<T>::insertEnd(T data){
 }
 
 template <typename T>
-T SimpleList<T>::removeFront(){			//make sure later code doesnt permit this if size == zero
+T SimpleList<T>::removeFront(){			//implementation does not permit this if size == zero
 	T object = (head->next)->data;
 	Node *intermediateNode = (head->next)->next;
 	delete head->next;
@@ -86,7 +86,7 @@ int SimpleList<T>::getSize(){
 	return size;
 }
 
-//DERIVED CLASSES
+//DERIVED CLASSES (Stack and Queue)
 
 template <typename T>
 class Stack : public SimpleList<T>{
@@ -108,7 +108,7 @@ T Stack<T>::pop(){
 }
 
 template <typename T>
-Stack<T>::Stack(string n) : SimpleList<T>(n){      //correct syntax for using the base constructor as well :) thank https://stackoverflow.com/questions/18347474/shadows-a-parameter-when-single-parameter-on-constructor
+Stack<T>::Stack(string n) : SimpleList<T>(n){
 }
 
 template <typename T>
@@ -142,8 +142,10 @@ void getInOutFile(string &inFile, string &outFile){
 	return;
 }
 
+/*checkExistence returns false if the SimpleList exists in a given list (based off name)
+ * and returns true if it does not exist*/
 template <typename T>
-bool checkExistence(list<SimpleList<T> *> &SL, string name){                  //return false if it exits, else return a true
+bool checkExistence(list<SimpleList<T> *> &SL, string name){
         typename list<SimpleList<T> *>::iterator it;
         for (it = SL.begin(); it != SL.end(); it++){
                 if ((*it)->getName() == name){
@@ -153,8 +155,10 @@ bool checkExistence(list<SimpleList<T> *> &SL, string name){                  //
         return true;
 }
 
+/*getListPointer returns a SimpleList pointer if the SimpleList exists in a given list (based off name)
+ * returns a nullpointer if it does not exist*/
 template <typename T>
-SimpleList<T>* getListPointer(list<SimpleList<T> *> &SL, string name){			//return list pointer if it exits, else a nullpointer
+SimpleList<T>* getListPointer(list<SimpleList<T> *> &SL, string name){
 	typename list<SimpleList<T> *>::iterator it;
 	for (it = SL.begin(); it != SL.end(); it++){
 		if ((*it)->getName() == name){
@@ -270,7 +274,9 @@ void pop(string name, list<SimpleList<T> *> &listSLT, ofstream &outFile){
 	return;
 }
 
-void runCommands (const string commandFileName, const string outputFileName){    //handles reading the names and calling appropriate commands
+/*Parses commands from the input file, runs create, push, and pull commands based on input.
+ * Holds the lists of SimpleList Pointers and handles filestream as well.*/
+void runCommands (const string commandFileName, const string outputFileName){
 	ifstream commands (commandFileName, ifstream::in);
 	ofstream outFile;
 	outFile.open(outputFileName);
@@ -279,7 +285,7 @@ void runCommands (const string commandFileName, const string outputFileName){   
         list<SimpleList<double> *> listSLd;
         list<SimpleList<string> *> listSLs;
 
-	string cm1, cm2, cm3 = "null";		//Important for case "pop"
+	string cm1, cm2, cm3 = "null";
 	int cmi = 0;
 	double cmd = 0.0;
 
