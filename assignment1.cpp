@@ -59,7 +59,7 @@ void SimpleList<T>::insertEnd(T data){
 		head->last = newNode;
 	}
 	else if (size > 0){
-		*(head->last)->next = newNode;			//be careful
+		(head->last)->next = newNode;			//be careful
 		head->last = newNode;
 	}
 	size++;
@@ -68,8 +68,8 @@ void SimpleList<T>::insertEnd(T data){
 
 template <typename T>
 T SimpleList<T>::removeFront(){			//make sure later code doesnt permit this if size == zero
-	T object = head->next->data;
-	Node *intermediateNode = head->next->next;
+	T object = (head->next)->data;
+	Node *intermediateNode = (head->next)->next;
 	delete head->next;
 	head->next = intermediateNode;
 	size--;
@@ -170,7 +170,7 @@ void commandMessage(int messageID, string cm1, string cm2, T cm3, ofstream &outF
 		outFile << "PROCESSING COMMAND: " << cm1 << " " << cm2 << " " << cm3 << "\n";
 	}
 	else if (messageID == 1){
-		outFile << "PROCESSING COMMAND: " << cm1 << " " << cm2 << " " << "\n";
+		outFile << "PROCESSING COMMAND: " << cm1 << " " << cm2 << "\n";
 	}
 	return;
 }
@@ -262,7 +262,7 @@ void pop(string name, list<SimpleList<T> *> &listSLT, ofstream &outFile){
 		}
 		else if (target->getSize() > 0){
 			poppedValue = target->pop();
-			
+			popMessage(poppedValue, outFile);
 			return;
 		}
 	}
