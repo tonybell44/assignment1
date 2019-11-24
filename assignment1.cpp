@@ -249,8 +249,7 @@ void pop(string name, list<SimpleList<T> *> &listSLT, ofstream &outFile){
  * Holds the lists of SimpleList Pointers and handles filestream as well.*/
 void runCommands (const string commandFileName, const string outputFileName){
 	ifstream commands (commandFileName, ifstream::in);
-	ofstream outFile;
-	outFile.open(outputFileName);
+	ofstream outFile (outputFileName, ofstream::out);
 
         list<SimpleList<int> *> listSLi;
         list<SimpleList<double> *> listSLd;
