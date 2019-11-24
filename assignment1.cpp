@@ -197,48 +197,19 @@ void popMessage(T data, ofstream &outFile){
 	return;
 }
 
-void create(const string name, const string type, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs, ofstream &outFile){
-	if (*(name.begin()) == 'i'){
-		if (checkExistence(listSLi, name)){
-			SimpleList<int> *pSLi;
-			if (type == "stack"){
-				pSLi = new Stack<int>(name);
-				listSLi.push_front(pSLi);
-			}
-			else if (type == "queue"){
-				pSLi = new Queue<int>(name);
-				listSLi.push_front(pSLi);
-			}
-			return;
+template <typename T>
+void create(const string name, const string type, list<SimpleList<T> *> &listSLT, ofstream &outFile){
+	if (checkExistence(listSLT, name)){
+		SimpleList<T> *pSLT;
+		if (type == "stack"){
+			pSLT = new Stack<T>(name);
+			listSLT.push_front(pSLT);
 		}
-	}
-	else if (*(name.begin()) == 'd'){
-		if (checkExistence(listSLd, name)){
-			SimpleList<double> *pSLd;
-			if (type == "stack"){
-				pSLd = new Stack<double>(name);
-				listSLd.push_front(pSLd);
-			}
-			else if (type == "queue"){
-				pSLd = new Queue<double>(name);
-				listSLd.push_front(pSLd);
-			}
-			return;
+		else if (type == "queue"){
+			pSLT = new Queue<T>(name);
+			listSLT.push_front(pSLT);
 		}
-	}
-	else if (*(name.begin()) == 's'){
-		if (checkExistence(listSLs, name)){
-			SimpleList<string> *pSLs;
-			if (type == "stack"){
-				pSLs = new Stack<string>(name);
-				listSLs.push_front(pSLs);
-			}
-			else if (type == "queue"){
-				pSLs = new Queue<string>(name);
-				listSLs.push_front(pSLs);
-			}
-			return;
-		}
+		return;
 	}
 	errorMessage(0, outFile);
 	return;
@@ -293,7 +264,15 @@ void runCommands (const string commandFileName, const string outputFileName){
 		if (cm1 == "create"){
 			commands >> cm3;
 			commandMessage(0, cm1, cm2, cm3, outFile);
-			create (cm2, cm3, listSLi, listSLd, listSLs, outFile);
+			if (*(cm2.begin()) == 'i'){
+				create(cm2, cm3, listSLi, outFile);
+                        }
+                        else if (*(cm2.begin()) == 'd'){
+				create(cm2, cm3, listSLd, outFile);
+                        }
+                        else if (*(cm2.begin()) == 's'){
+				create(cm2, cm3, listSLs, outFile);
+                        }
 		}
 		else if (cm1 == "push"){
 			if (*(cm2.begin()) == 'i'){
