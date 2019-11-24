@@ -143,17 +143,29 @@ void getInOutFile(string &inFile, string &outFile){
 }
 
 template <typename T>
-bool checkExistence(list<SimpleList<T> *> &SL, string name){			//return false if name exists, true if name does not exist
+bool checkExistence(list<SimpleList<T> *> &SL, string name){                  //return false if it exits, else return a true
+        typename list<SimpleList<T> *>::iterator it;
+        for (it = SL.begin(); it != SL.end(); it++){
+                if ((*it)->getName() == name){
+                        return false;
+                }
+        }
+        return true;
+}
+
+template <typename T>
+SimpleList<T>* getListPointer(list<SimpleList<T> *> &SL, string name){			//return list pointer if it exits, else a nullpointer
 	typename list<SimpleList<T> *>::iterator it;
 	for (it = SL.begin(); it != SL.end(); it++){
 		if ((*it)->getName() == name){
-			return false;
+			return *it;
 		}
 	}
-	return true;
+	return nullptr;
 }
 
-void commandMessage(int messageID, string cm1, string cm2, string cm3, ofstream &outFile){
+template <typename T>
+void commandMessage(int messageID, string cm1, string cm2, T cm3, ofstream &outFile){
 	if (messageID == 0){
 		outFile << "PROCESSING COMMAND: " << cm1 << " " << cm2 << " " << cm3 << "\n";
 	}
@@ -173,6 +185,12 @@ void errorMessage(int messageID, ofstream &outFile){
 	else if (messageID == 2){
 		outFile << "ERROR: This list is empty!" << "\n";
 	}
+}
+
+template <typename T>
+void popMessage(T data, ofstream &outFile){
+	outFile << "Value popped: " << data << "\n";
+	return;
 }
 
 void create(const string name, const string type, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs, ofstream &outFile){
@@ -223,10 +241,33 @@ void create(const string name, const string type, list<SimpleList<int> *> &listS
 }
 
 template <typename T>
-void push(const string name, const T value, list<SimpleList<int> *> &listSLi, list<SimpleList<double> *> &listSLd,  list<SimpleList<string> *> &listSLs, ofstream &outFile){
-	if (*(name.begin()) == 'i'){
-		//HEEEEERRRREEEE
-	}	
+void push(string name, T value, list<SimpleList<T> *> &listSLT, ofstream &outFile){
+	if (!checkExistence(listSLT, name)){
+		getListPointer(listSLT, name)->push(value);
+		return;
+	}
+	errorMessage(1, outFile);
+	return;
+}
+
+template <typename T>
+void pop(string name, list<SimpleList<T> *> &listSLT, ofstream &outFile){
+	SimpleList<T>* target;
+	T poppedValue;
+	if (!checkExistence(listSLT, name)){
+		target = getListPointer(listSLT, name);
+		if (target->getSize() <= 0){
+			errorMessage(2, outFile);
+			return;
+		}
+		else if (target->getSize() > 0){
+			poppedValue = target->pop();
+			
+			return;
+		}
+	}
+	errorMessage(1, outFile);
+	return;
 }
 
 void runCommands (const string commandFileName, const string outputFileName){    //handles reading the names and calling appropriate commands
@@ -239,6 +280,8 @@ void runCommands (const string commandFileName, const string outputFileName){   
         list<SimpleList<string> *> listSLs;
 
 	string cm1, cm2, cm3 = "null";		//Important for case "pop"
+	int cmi = 0;
+	double cmd = 0.0;
 
 	while(commands >> cm1 >> cm2){
 		if (cm1 == "create"){
@@ -247,13 +290,35 @@ void runCommands (const string commandFileName, const string outputFileName){   
 			create (cm2, cm3, listSLi, listSLd, listSLs, outFile);
 		}
 		else if (cm1 == "push"){
-			commands >> cm3;
-			commandMessage(0, cm1, cm2, cm3, outFile);
-			push (cm2, cm3, listSLi, listSLd, listSLs,outFile);
+			if (*(cm2.begin()) == 'i'){
+				commands >> cmi;
+				commandMessage(0, cm1, cm2, cmi, outFile);
+				push (cm2, cmi, listSLi, outFile);
+			}
+			else if (*(cm2.begin()) == 'd'){
+				commands >> cmd;
+				commandMessage(0, cm1, cm2, cmd, outFile);
+				push (cm2, cmd, listSLd, outFile);
+			}
+			else if (*(cm2.begin()) == 's'){
+				commands >> cm3;
+				commandMessage(0, cm1, cm2, cm3, outFile);
+				push (cm2, cm3, listSLs, outFile);
+			}
 		}
 		else if (cm1 == "pop"){
-			commandMessage(1, cm1, cm2, cm3, outFile);
-			pop (cm2, listSLi, listSLd, listSLs, outFile);
+			if (*cm2.begin() == 'i'){
+				commandMessage(1, cm1, cm2, cm3, outFile);
+				pop (cm2, listSLi, outFile);
+			}
+			else if (*cm2.begin() == 'd'){
+				commandMessage(1, cm1, cm2, cm3, outFile);
+				pop (cm2, listSLd, outFile);
+			}
+			else if (*cm2.begin() == 's'){
+				commandMessage(1, cm1, cm2, cm3, outFile);
+				pop (cm2, listSLs, outFile);
+			}
 		}
 	}
 	commands.close();
